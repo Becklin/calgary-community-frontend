@@ -88,7 +88,7 @@ function App() {
         // "http://localhost:8000/api/v1/service/",
         // "http://localhost:8000/api/v1/fetch-data/",
         "https://calcommunity.onrender.com/api/v1/community/",
-        "https://calcommunity.onrender.com/api/v1/community/",
+        "https://calcommunity.onrender.com/api/v1/service/",
         "https://calcommunity.onrender.com/api/v1/fetch-data/",
       ];
       try {
