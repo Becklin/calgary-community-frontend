@@ -52,7 +52,8 @@ function App() {
     try {
       setLoading(true);
       const rankingResponse = await fetch(
-        "http://localhost:8000/api/v1/community-rank/",
+        // "http://localhost:8000/api/v1/community-rank/",
+        "https://calcommunity.onrender.com/api/v1/community-rank/",
         {
           method: "POST",
           headers: {
@@ -83,9 +84,12 @@ function App() {
     const getData = async () => {
       setLoading(true);
       const urls = [
-        "http://localhost:8000/api/v1/community/",
-        "http://localhost:8000/api/v1/service/",
-        "http://localhost:8000/api/v1/fetch-data/",
+        // "http://localhost:8000/api/v1/community/",
+        // "http://localhost:8000/api/v1/service/",
+        // "http://localhost:8000/api/v1/fetch-data/",
+        "https://calcommunity.onrender.com/api/v1/community/",
+        "https://calcommunity.onrender.com/api/v1/community/",
+        "https://calcommunity.onrender.com/api/v1/fetch-data/",
       ];
       try {
         const jsons = await Promise.all(
@@ -96,7 +100,8 @@ function App() {
           })
         );
         const rankingResp = await fetch(
-          "http://localhost:8000/api/v1/community-rank/",
+          // "http://localhost:8000/api/v1/community-rank/",
+          "https://calcommunity.onrender.com/api/v1/community-rank/",
           {
             method: "POST",
             headers: {
