@@ -18,6 +18,11 @@ import MapController from "./components/MapController";
 import WeightsForm from "./components/WeightsForm/WeightsForm";
 import Legend from "./components/Legend/Legend";
 import ZoomHandler from "./components/ZoomHandler";
+const apiUrl =
+  import.meta.env.VITE_API_URL ||
+  (window.location.hostname === "localhost"
+    ? "http://127.0.0.1:8000"
+    : "https://calcommunity.onrender.com");
 
 function App() {
   const [ranking, setRanking] = useState([]);
@@ -52,8 +57,7 @@ function App() {
     try {
       setLoading(true);
       const rankingResponse = await fetch(
-        // "http://localhost:8000/api/v1/community-rank/",
-        "https://calcommunity.onrender.com/api/v1/community-rank/",
+        `${apiUrl}/api/v1/community-rank/`,
         {
           method: "POST",
           headers: {
@@ -84,12 +88,9 @@ function App() {
     const getData = async () => {
       setLoading(true);
       const urls = [
-        // "http://localhost:8000/api/v1/community/",
-        // "http://localhost:8000/api/v1/service/",
-        // "http://localhost:8000/api/v1/fetch-data/",
-        "https://calcommunity.onrender.com/api/v1/community/",
-        "https://calcommunity.onrender.com/api/v1/service/",
-        "https://calcommunity.onrender.com/api/v1/fetch-data/",
+         `${apiUrl}/api/v1/community/`,
+         `${apiUrl}/api/v1/service/`,
+         `${apiUrl}/api/v1/fetch-data/`,
       ];
       try {
         const jsons = await Promise.all(
@@ -100,8 +101,7 @@ function App() {
           })
         );
         const rankingResp = await fetch(
-          // "http://localhost:8000/api/v1/community-rank/",
-          "https://calcommunity.onrender.com/api/v1/community-rank/",
+           `${apiUrl}/api/v1/community-rank/`,
           {
             method: "POST",
             headers: {
@@ -218,9 +218,12 @@ function App() {
         </Marker>
       );
     };
-    const result = services.reduce(function (result, { type, ...rest }) {
+    const result = services.reduce(function (result, { type, ...rest }, index) {
       if (type !== "Community Centre") {
-        result.push(transform(type, rest));
+        result.push({
+          index,
+          ...transform(type, rest)
+        });
       }
       return result;
     }, []);
@@ -281,13 +284,9 @@ function App() {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-
           {/* {displayIncome(income)} */}
-
           {displayCommunities(ranking)}
-
           {displayServices(services)}
-
           <MapController position={position} />
           <Legend />
           <ZoomHandler onZoomChange={handleZoomChange} />
