@@ -67,7 +67,6 @@ function App() {
         }
       );
       const rankingJson = await rankingResponse.json();
-      console.log("rankingJson", rankingJson);
       setRanking(rankingJson.data);
     } catch (error) {
       console.error("Error fetching ranking data:", error);
@@ -83,7 +82,6 @@ function App() {
   useEffect(() => {
     const getData = async () => {
       setLoading(true);
-      console.log("setLoading");
       const urls = [
         "http://localhost:8000/api/v1/community/",
         "http://localhost:8000/api/v1/service/",
@@ -112,7 +110,6 @@ function App() {
           }
         );
         const rankingJson = await rankingResp.json();
-        console.log("jsons", jsons);
         setService(jsons[1]);
         setRanking(rankingJson.data);
       } catch (error) {
