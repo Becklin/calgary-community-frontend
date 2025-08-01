@@ -26,6 +26,8 @@ const apiUrl =
 
 function App() {
   const [ranking, setRanking] = useState([]);
+  const [community, setCommunity] = useState([]);
+
   const [services, setService] = useState([]);
   const [values, setValues] = useState({ crimes: 4, services: 4, income: 2 });
   const [position, setPosition] = useState([51.0447, -114.0719]);
@@ -72,6 +74,16 @@ function App() {
         }
       );
       const rankingJson = await rankingResponse.json();
+      const communityWithScores = community.reduce((acc, item) => {
+        const match = rankingJson.data.find(rankingItem => rankingItem.id === item.id);
+        acc.push({
+          ...item,
+          score: match.score,
+          service_count: match.service_count,
+        });
+        return acc;
+      }, []);
+      setCommunity(communityWithScores)
       setRanking(rankingJson.data);
     } catch (error) {
       console.error("Error fetching ranking data:", error);
@@ -86,13 +98,13 @@ function App() {
   };
   useEffect(() => {
     const getData = async () => {
-      setLoading(true);
       const urls = [
          `${apiUrl}/api/v1/community/`,
          `${apiUrl}/api/v1/service/`,
          `${apiUrl}/api/v1/fetch-data/`,
       ];
       try {
+        // render map first without waiting for ranking response
         const jsons = await Promise.all(
           urls.map(async (url) => {
             const resp = await fetch(url);
@@ -100,7 +112,11 @@ function App() {
             return json;
           })
         );
-        const rankingResp = await fetch(
+        setCommunity(jsons[0]);
+        setService(jsons[1]);
+        // async heavy computation
+        setLoading(true);
+        fetch(
            `${apiUrl}/api/v1/community-rank/`,
           {
             method: "POST",
@@ -113,33 +129,32 @@ function App() {
               income: values.income,
             }),
           }
-        );
-        const rankingJson = await rankingResp.json();
-        setService(jsons[1]);
-        setRanking(rankingJson.data);
+        ).then((resp) => resp.json()).then((json) =>{
+          const communityWithScores = jsons[0].reduce((acc, item) => {
+            const match = json.data.find(rankingItem => rankingItem.id === item.id);
+            acc.push({
+              ...item,
+              score: match.score,
+              service_count: match.service_count,
+            });
+            return acc;
+          }, []);
+          setCommunity(communityWithScores)
+          setRanking(json.data);
+          setLoading(false);
+        });
       } catch (error) {
         console.error("Error fetching data:", error);
         message.error("Failed to fetch data. Please try again later.");
         setError(error.message);
-      } finally {
-        setLoading(false);
       }
     };
     getData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const class_colors = {
-    1: "#e41a1c",
-    2: "#377eb8",
-    3: "#4daf4a",
-    4: "#984ea3",
-  };
-
-  const displayCommunities = (ranking) => {
-    const results = ranking.map((comm, index) => {
-      const { id, name, score, income, sector, service_count, multipolygon } =
-        comm;
+  const displayCommunities = (comm) => {
+    const results = comm.map(({ id, name, income, sector, multipolygon, score, service_count }, index) => {
       return (
         <Polygon
           key={index}
@@ -149,11 +164,11 @@ function App() {
             color:
               id == highlightedCommunity
                 ? "white"
-                : class_colors[comm.class_code],
-            weight: id == highlightedCommunity ? 5 : 2,
+                : "#686868ff",
+            weight: id == highlightedCommunity ? 5 : .6,
             fillColor: "rgb(138, 197, 143)",
           }}
-          positions={JSON.parse(multipolygon).coordinates}
+          positions={multipolygon.coordinates}
         >
           <Tooltip sticky>
             <div className="">
@@ -161,11 +176,11 @@ function App() {
               <br />
               <span>{sector}</span>
               <br />
-              <span>crimes :{service_count}</span>
+              {service_count && (<span>crimes :{service_count}</span>)}
               <br />
               <span>income :{income}</span>
               <br />
-              <span>score :{(score * 1000).toFixed()}</span>
+              {score && (<span>score :{(score * 1000).toFixed()}</span>)}
             </div>
           </Tooltip>
         </Polygon>
@@ -284,8 +299,7 @@ function App() {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          {/* {displayIncome(income)} */}
-          {displayCommunities(ranking)}
+          {displayCommunities(community)}
           {displayServices(services)}
           <MapController position={position} />
           <Legend />
