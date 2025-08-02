@@ -23,7 +23,7 @@ const apiUrl =
   (window.location.hostname === "localhost"
     ? "http://127.0.0.1:8000"
     : "https://calcommunity.onrender.com");
-
+console.log(apiUrl);
 function App() {
   const [ranking, setRanking] = useState([]);
   const [community, setCommunity] = useState([]);
@@ -101,7 +101,6 @@ function App() {
       const urls = [
          `${apiUrl}/api/v1/community/`,
          `${apiUrl}/api/v1/service/`,
-         `${apiUrl}/api/v1/fetch-data/`,
       ];
       try {
         // render map first without waiting for ranking response
