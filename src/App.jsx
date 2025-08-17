@@ -160,12 +160,12 @@ function App() {
           weight={1}
           fillOpacity="0.4"
           pathOptions={{
-            color:
-              id == highlightedCommunity
-                ? "white"
-                : "#686868ff",
+            color: "#a8a8a8ff",
             weight: id == highlightedCommunity ? 5 : .6,
-            fillColor: "rgb(138, 197, 143)",
+            fillColor:
+              id == highlightedCommunity
+                ? "transpasrent"
+                : "rgba(231, 231, 231, .5)",
           }}
           positions={multipolygon.coordinates}
         >
@@ -295,8 +295,10 @@ function App() {
           }}
         >
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
+            subdomains={["a", "b", "c", "d"]}
+            maxZoom={20}
           />
           {displayCommunities(community)}
           {displayServices(services)}
